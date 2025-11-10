@@ -9,3 +9,9 @@ python -m pip install --upgrade pip
 
 ## Requirements commands
 pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic[email] python-dotenv
+
+
+## Run the server
+fastapi dev main.py
+
+uvicorn app.main:app --reload
