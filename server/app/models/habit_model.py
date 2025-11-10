@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 import enum
-from datetime import datetime,pytz
+from datetime import datetime
 
 # Enums
 class FrequencyEnum(str,enum.Enum):

@@ -15,3 +15,12 @@ pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic[email] python-do
 fastapi dev main.py
 
 uvicorn app.main:app --reload
+
+
+## For Table creation
+'''
+python
+from app.models.habit_model import Habit
+from app.core.database import Base, engine
+Base.metadata.create_all(bind=engine)
+'''
