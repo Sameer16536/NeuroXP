@@ -10,8 +10,8 @@ app.include_router(habit_routes.router,prefix="/habits",tags=["Habits"])
 
 
 
+# Basic route to check if the server is running
 @app.get("/")
-
 
 def root():
     return {"message": "Welcome to NeuroXP"}

@@ -11,6 +11,9 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(DATABASE_URL, echo=True)
 
+
+# Used in routes to talk to the database
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Base class for all SQLAlchemy models
 Base = declarative_base()

@@ -14,7 +14,8 @@ class PriorityEnum(str, enum.Enum):
     low = "low"
     medium = "medium"
     high = "high"
-    
+
+# SQLAlchemy Habit Model ---> Table in PostgreSQL
 class Habit(Base):
     __tablename__ = "habits"
     
