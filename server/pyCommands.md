@@ -9,6 +9,8 @@ python -m pip install --upgrade pip
 
 ## Requirements commands
 pip install fastapi uvicorn sqlalchemy psycopg2-binary pydantic[email] python-dotenv
+pip install python-jose[cryptography] passlib[bcrypt]
+
 
 
 ## Run the server
