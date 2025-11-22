@@ -22,7 +22,9 @@ uvicorn app.main:app --reload
 ## For Table creation
 '''
 python
-from app.models.habit_model import Habit
 from app.core.database import Base, engine
+from app.models.user import User
+from app.models.habit import Habit
 Base.metadata.create_all(bind=engine)
+
 '''
