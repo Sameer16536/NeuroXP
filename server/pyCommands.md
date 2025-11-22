@@ -23,8 +23,8 @@ uvicorn app.main:app --reload
 '''
 python
 from app.core.database import Base, engine
-from app.models.user import User
-from app.models.habit import Habit
+from app.models.user_model import User
+from app.models.habit_model import Habit
 Base.metadata.create_all(bind=engine)
 
 '''
