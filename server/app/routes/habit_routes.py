@@ -19,7 +19,7 @@ def get_db():
 
 
 # Create a new habit
-@router.post("/", response_model=HabitResponse)
+@router.post("/createhabit", response_model=HabitResponse)
 def create_habit(habit: HabitCreate, db: Session = Depends(get_db)):
     db_habit = Habit(**habit.dict())
     db.add(db_habit)
@@ -28,6 +28,6 @@ def create_habit(habit: HabitCreate, db: Session = Depends(get_db)):
     return db_habit
 
 # Get all habits
-@router.get("/", response_model=List[HabitResponse])
+@router.get("/getallhabits", response_model=List[HabitResponse])
 def get_habits(db: Session = Depends(get_db)):
     return db.query(Habit).all()
