@@ -3,7 +3,7 @@ import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Login from './pages/Login';
 import Signup from './pages/SignUp';
-import { Layout } from 'lucide-react';
+import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Habits from './pages/Habits';
 import Tasks from './pages/Tasks';

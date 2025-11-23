@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { LayoutDashboard, CheckSquare, Trophy, User, LogOut, Disc, Sword } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-import { logout } from '../features/auth/authSlice';
+import { logout } from "../features/auth/authSlice";
 
 const Layout: React.FC = () => {
   const dispatch = useDispatch();
