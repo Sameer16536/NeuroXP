@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Rajdhani", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "Share Tech Mono", monospace;
+
+  --color-dark-800: #1e293b;
+  --color-dark-900: #0f172a;
+  --color-dark-950: #020617;
+
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-900: #1e3a8a;
+
+  --color-emerald-600: #059669;
+  --color-emerald-900: #064e3b;
+  --color-emerald-910: #042f2e;
+
+  --color-system-blue: #00f0ff;
+  --color-system-cyan: #0ea5e9;
+  --color-system-dark: #050b14;
+  --color-system-panel: #0a101f;
+  --color-system-border: #1e3a8a;
+  --color-system-danger: #ef4444;
+
+  --animation-pulse-fast: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animation-glitch: glitch 1s linear infinite;
+  --animation-spin-slow: spin 3s linear infinite;
+}
+
+
