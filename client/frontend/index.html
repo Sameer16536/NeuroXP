@@ -1,13 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NeuroXP</title>
-  </head>
-  <body>
+    <title>NeuroXP - System Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Rajdhani', 'sans-serif'],
+              mono: ['"Share Tech Mono"', 'monospace'],
+            },
+            colors: {
+              system: {
+                blue: '#00f0ff',
+                cyan: '#0ea5e9',
+                dark: '#050b14',
+                panel: '#0a101f',
+                border: '#1e3a8a',
+                danger: '#ef4444',
+              },
+              primary: {
+                400: '#a78bfa',
+                500: '#8b5cf6',
+                600: '#7c3aed',
+                900: '#4c1d95',
+              },
+              dark: {
+                800: '#1e293b',
+                900: '#0f172a',
+                950: '#020617',
+              }
+            },
+            animation: {
+              'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glitch': 'glitch 1s linear infinite',
+            },
+            keyframes: {
+              glitch: {
+                '2%, 64%': { transform: 'translate(2px,0) skew(0deg)' },
+                '4%, 60%': { transform: 'translate(-2px,0) skew(0deg)' },
+                '62%': { transform: 'translate(0,0) skew(5deg)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-redux": "https://aistudiocdn.com/react-redux@^9.2.0",
+    "@reduxjs/toolkit": "https://aistudiocdn.com/@reduxjs/toolkit@^2.10.1",
+    "@reduxjs/toolkit/": "https://aistudiocdn.com/@reduxjs/toolkit@^2.10.1/"
+  }
+}
+</script>
+<style>
+  body {
+    background-color: #020617;
+    background-image: 
+      linear-gradient(rgba(30, 58, 138, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 58, 138, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  
+  /* Custom Scrollbar for the System Look */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050b14; 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e3a8a; 
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2563eb; 
+  }
+
+  .system-border {
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.1), inset 0 0 20px rgba(0, 240, 255, 0.05);
+    border: 1px solid rgba(30, 58, 138, 0.5);
+  }
+  
+  .system-glow {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  }
+</style>
+</head>
+  <body class="bg-dark-950 text-slate-200 antialiased overflow-hidden">
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

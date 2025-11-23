@@ -1,25 +1,30 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-
+from datetime import datetime
 
 # Base schema for User
 class UserBase(BaseModel):
-    emaii: EmailStr
+    email: EmailStr
     name: Optional[str] = None
     
     
 # For Signup
 class UserCreate(UserBase):
     password: str
+    
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
 
 
 # For Response
 class UserResponse(UserBase):
     id: int
-    created_at: Optional[str]  # ISO formatted datetime string
-
+    created_at: datetime
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     
     
