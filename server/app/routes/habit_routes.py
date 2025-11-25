@@ -18,16 +18,47 @@ def get_db():
         db.close()
 
 
+# Get all habits for authenticated user
+@router.get("/", response_model=List[HabitResponse])
+def get_habits(user_id: int, db: Session = Depends(get_db)):
+    """Get all habits for the current user"""
+    habits = db.query(Habit).filter(Habit.user_id == user_id).all()
+    return habits
+
+
 # Create a new habit
-@router.post("/createhabit", response_model=HabitResponse)
-def create_habit(habit: HabitCreate, db: Session = Depends(get_db)):
-    db_habit = Habit(**habit.dict())
+@router.post("/", response_model=HabitResponse)
+def create_habit(habit: HabitCreate, user_id: int, db: Session = Depends(get_db)):
+    """Create a new habit for the current user"""
+    db_habit = Habit(**habit.dict(), user_id=user_id)
     db.add(db_habit)
     db.commit()
     db.refresh(db_habit)
     return db_habit
 
-# Get all habits
-@router.get("/getallhabits", response_model=List[HabitResponse])
-def get_habits(db: Session = Depends(get_db)):
-    return db.query(Habit).all()
+
+# Complete a habit and earn XP
+@router.post("/{id}/complete", response_model=dict)
+def complete_habit(id: int, user_id: int, db: Session = Depends(get_db)):
+    """Mark a habit as completed and earn XP"""
+    habit = db.query(Habit).filter(Habit.id == id, Habit.user_id == user_id).first()
+    
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+    
+    # Mark as completed
+    habit.is_completed_today = True
+    
+    # Update user XP
+    from app.models.user_model import User
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        user.current_xp += habit.xp_reward
+        # Check for level up
+        if user.current_xp >= user.xp_to_next_level:
+            user.level += 1
+            user.current_xp -= user.xp_to_next_level
+            user.xp_to_next_level = int(user.xp_to_next_level * 1.1)  # Increase next level requirement
+    
+    db.commit()
+    return {"success": True, "xp_gained": habit.xp_reward}

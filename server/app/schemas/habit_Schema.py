@@ -4,21 +4,20 @@ from enum import Enum
 
 # Enums for Request/Response Validation
 class FrequencyEnum(str, Enum):
-    daily = "daily"
-    weekly = "weekly"
-    monthly = "monthly"
+    DAILY = "DAILY"
+    WEEKLY = "WEEKLY"
 
 class PriorityEnum(str, Enum):
-    low = "low"
-    medium = "medium"
-    high = "high"
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
 
 class HabitBase(BaseModel):
-    name: str
+    title: str
     description: Optional[str] = None
-    xp_value: Optional[int] = 10
-    priority: PriorityEnum = PriorityEnum.medium
-    frequency: FrequencyEnum = FrequencyEnum.daily
+    xp_reward: int = 10
+    priority: PriorityEnum = PriorityEnum.MEDIUM
+    frequency: FrequencyEnum = FrequencyEnum.DAILY
 
 # Schema for creating a new Habit
 class HabitCreate(HabitBase):
@@ -27,7 +26,9 @@ class HabitCreate(HabitBase):
 # Schema for sending response back to user
 class HabitResponse(HabitBase):
     id: int
+    user_id: int
+    is_completed_today: bool
     
     # This allows Pydantic to convert SQLAlchemy Model → JSON automatically
     class Config:
-        orm_mode = True
+        from_attributes = True

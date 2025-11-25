@@ -1,29 +1,30 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 import enum
 from datetime import datetime
 
 # Enums
-class FrequencyEnum(str,enum.Enum):
-    daily ="daily"
-    weekly = "weekly"
-    monthly = "monthly"
+class FrequencyEnum(str, enum.Enum):
+    DAILY = "DAILY"
+    WEEKLY = "WEEKLY"
     
 class PriorityEnum(str, enum.Enum):
-    low = "low"
-    medium = "medium"
-    high = "high"
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
 
 # SQLAlchemy Habit Model ---> Table in PostgreSQL
 class Habit(Base):
     __tablename__ = "habits"
     
-    id = Column(Integer,primary_key=True,index=True)
-    name = Column(String,nullable=False)
-    description = Column(String,nullable=False)
-    xp_value = Column(Integer,default=0)
-    priority = Column(Enum(PriorityEnum),default=PriorityEnum.medium)
-    frequency = Column(Enum(FrequencyEnum),default=FrequencyEnum.daily)
-    created_at = Column(DateTime,default=datetime.now())
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    xp_reward = Column(Integer, default=10)
+    priority = Column(Enum(PriorityEnum), default=PriorityEnum.MEDIUM)
+    frequency = Column(Enum(FrequencyEnum), default=FrequencyEnum.DAILY)
+    is_completed_today = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
     
