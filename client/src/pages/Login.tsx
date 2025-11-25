@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const userData = await login({ username: email, password }).unwrap(); 
+      const userData = await login({ email, password }).unwrap(); 
       
       dispatch(setCredentials({ user: userData.user, token: userData.access_token }));
       navigate('/dashboard');
