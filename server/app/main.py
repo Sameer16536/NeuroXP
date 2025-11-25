@@ -1,13 +1,14 @@
 from fastapi import FastAPI
-from app.routes import user_routes,habit_routes
+from app.routes import user_routes, habit_routes, task_routes
 from fastapi.middleware.cors import CORSMiddleware
 
 
-app = FastAPI(title="NeuroXP",version="1.0.0")
+app = FastAPI(title="NeuroXP", version="1.0.0")
 
-#Include routers
-app.include_router(user_routes.router,prefix="/users",tags=["Users"])
-app.include_router(habit_routes.router,prefix="/habits",tags=["Habits"])
+# Include routers
+app.include_router(user_routes.router, prefix="/users", tags=["Users"])
+app.include_router(habit_routes.router, prefix="/habits", tags=["Habits"])
+app.include_router(task_routes.router, prefix="/tasks", tags=["Tasks"])
 
 origins = [
     "http://localhost:5173", 
@@ -26,6 +27,5 @@ app.add_middleware(
 
 # Basic route to check if the server is running
 @app.get("/")
-
 def root():
     return {"message": "Welcome to NeuroXP"}
