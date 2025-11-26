@@ -13,6 +13,12 @@ class TaskBase(BaseModel):
 class TaskCreate(TaskBase):
     pass
 
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    deadline: Optional[str] = None
+    xp_reward: Optional[int] = None
+    is_completed: Optional[bool] = None
 
 class TaskResponse(TaskBase):
     id: int

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.habit_model import Habit
-from app.schemas.habit_Schema import HabitCreate, HabitResponse
+from app.schemas.habit_Schema import HabitCreate, HabitResponse, HabitUpdate
 from typing import List
 
 # Create a router for all habit-related endpoints
@@ -19,7 +19,7 @@ def get_db():
 
 
 # Get all habits for authenticated user
-@router.get("/", response_model=List[HabitResponse])
+@router.get("/gethabits", response_model=List[HabitResponse])
 def get_habits(user_id: int, db: Session = Depends(get_db)):
     """Get all habits for the current user"""
     habits = db.query(Habit).filter(Habit.user_id == user_id).all()
@@ -27,7 +27,7 @@ def get_habits(user_id: int, db: Session = Depends(get_db)):
 
 
 # Create a new habit
-@router.post("/", response_model=HabitResponse)
+@router.post("/createhabit", response_model=HabitResponse)
 def create_habit(habit: HabitCreate, user_id: int, db: Session = Depends(get_db)):
     """Create a new habit for the current user"""
     db_habit = Habit(**habit.dict(), user_id=user_id)
@@ -62,3 +62,41 @@ def complete_habit(id: int, user_id: int, db: Session = Depends(get_db)):
     
     db.commit()
     return {"success": True, "xp_gained": habit.xp_reward}
+
+
+# Delete a Habit
+@router.delete("/{id}/delete", response_model=dict)
+def delete_habit(id: int, user_id: int, db: Session = Depends(get_db)):
+    """Delete a habit"""
+    habit = db.query(Habit).filter(Habit.id == id, Habit.user_id == user_id).first()
+    
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+    
+    try:
+        db.delete(habit)
+        db.commit()
+        return {"success": True, "message": "Habit deleted"}
+    
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not delete habit")
+
+# Edit a Habit
+@router.put("/{id}/edit", response_model=HabitResponse)
+def edit_habit(id: int, habit_update: HabitUpdate, user_id: int, db: Session = Depends(get_db)):
+    """Edit an existing habit"""
+    habit = db.query(Habit).filter(Habit.id == id, Habit.user_id == user_id).first()
+    
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+    
+    updatedData = habit_update.dict(exclude_unset=True) 
+    
+    # Update fields
+    for key, value in updatedData.items():
+        setattr(habit, key, value)
+    
+    db.commit()
+    db.refresh(habit)
+    return habit

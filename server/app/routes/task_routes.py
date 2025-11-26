@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.task_model import Task
-from app.schemas.task_Schema import TaskCreate, TaskResponse
+from app.schemas.task_Schema import TaskCreate, TaskResponse, TaskUpdate
 from typing import List
 
 # Create a router for all task-related endpoints
@@ -19,7 +19,7 @@ def get_db():
 
 
 # Get all tasks for authenticated user
-@router.get("/", response_model=List[TaskResponse])
+@router.get("/gettasks", response_model=List[TaskResponse])
 def get_tasks(user_id: int, db: Session = Depends(get_db)):
     """Get all tasks for the current user"""
     tasks = db.query(Task).filter(Task.user_id == user_id).all()
@@ -27,7 +27,7 @@ def get_tasks(user_id: int, db: Session = Depends(get_db)):
 
 
 # Create a new task
-@router.post("/", response_model=TaskResponse)
+@router.post("/createtask", response_model=TaskResponse)
 def create_task(task: TaskCreate, user_id: int, db: Session = Depends(get_db)):
     """Create a new task for the current user"""
     db_task = Task(**task.dict(), user_id=user_id)
@@ -68,7 +68,7 @@ def complete_task(id: int, user_id: int, db: Session = Depends(get_db)):
 
 
 # Delete a task
-@router.delete("/{id}", response_model=dict)
+@router.delete("/{id}/delete", response_model=dict)
 def delete_task(id: int, user_id: int, db: Session = Depends(get_db)):
     """Delete a task"""
     task = db.query(Task).filter(Task.id == id, Task.user_id == user_id).first()
@@ -79,3 +79,23 @@ def delete_task(id: int, user_id: int, db: Session = Depends(get_db)):
     db.delete(task)
     db.commit()
     return {"success": True}
+
+
+# Edit a task
+@router.put("/{id}/edit", response_model=TaskResponse)
+def edit_Task(id: int, task_update: TaskUpdate, user_id: int, db: Session = Depends(get_db)):
+    """Edit an existing task"""
+    task = db.query(Task).filter(task.id == id, task.user_id == user_id).first()
+    
+    if not task:
+        raise HTTPException(status_code=404, detail="task not found")
+    
+    updatedData = task_update.dict(exclude_unset=True) 
+    
+    # Update fields
+    for key, value in updatedData.items():
+        setattr(task, key, value)
+    
+    db.commit()
+    db.refresh(task)
+    return task

@@ -23,6 +23,15 @@ class HabitBase(BaseModel):
 class HabitCreate(HabitBase):
     pass
 
+# Schema for updating an existing Habit
+class HabitUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    xp_reward: Optional[int] = None
+    priority: Optional[PriorityEnum] = None
+    frequency: Optional[FrequencyEnum] = None
+    is_completed_today: Optional[bool] = None
+
 # Schema for sending response back to user
 class HabitResponse(HabitBase):
     id: int
