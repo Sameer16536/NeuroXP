@@ -54,14 +54,33 @@ def upgrade() -> None:
 
     op.create_index("ix_habits_id", "habits", ["id"])
 
+    # ---- TASKS TABLE ----
+    op.create_table(
+        "tasks",
+        sa.Column("id", sa.Integer, primary_key=True, nullable=False),
+        sa.Column("user_id", sa.Integer, sa.ForeignKey("users.id"), nullable=False),
+        sa.Column("title", sa.String, nullable=False),
+        sa.Column("description", sa.String),
+        sa.Column("xp_reward", sa.Integer),
+        sa.Column("priority", postgresql.ENUM("LOW", "MEDIUM", "HIGH", name="priorityenum")),
+        sa.Column("is_completed", sa.Boolean),
+        sa.Column("created_at", sa.DateTime),
+        sa.Column("due_date", sa.DateTime),
+    )
+
+    op.create_index("ix_tasks_id", "tasks", ["id"])
+
 
 def downgrade() -> None:
     """Drop tables if downgrading"""
 
-    op.drop_index("ix_habits_id", table_name="habits")
-    op.drop_table("habits")
+    op.drop_index("ix_tasks_id", table_name="tasks", if_exists=True)
+    op.drop_table("tasks", if_exists=True)
 
-    op.drop_index("ix_users_username", table_name="users")
-    op.drop_index("ix_users_email", table_name="users")
-    op.drop_index("ix_users_id", table_name="users")
-    op.drop_table("users")
+    op.drop_index("ix_habits_id", table_name="habits", if_exists=True)
+    op.drop_table("habits", if_exists=True)
+
+    op.drop_index("ix_users_username", table_name="users", if_exists=True)
+    op.drop_index("ix_users_email", table_name="users", if_exists=True)
+    op.drop_index("ix_users_id", table_name="users", if_exists=True)
+    op.drop_table("users", if_exists=True)

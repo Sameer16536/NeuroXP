@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.task_model import Task
+from app.models.user_model import User
 from app.schemas.task_Schema import TaskCreate, TaskResponse, TaskUpdate
+from app.core.security import verify_token
 from typing import List
 
 # Create a router for all task-related endpoints
@@ -18,19 +21,33 @@ def get_db():
         db.close()
 
 
+# Get current user by token
+def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="token")), db: Session = Depends(get_db)):
+    """Extract user from JWT token"""
+    user_id = verify_token(token)
+    if user_id is None:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return user
+
+
 # Get all tasks for authenticated user
-@router.get("/gettasks", response_model=List[TaskResponse])
-def get_tasks(user_id: int, db: Session = Depends(get_db)):
+@router.get("/", response_model=List[TaskResponse])
+def get_tasks(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Get all tasks for the current user"""
-    tasks = db.query(Task).filter(Task.user_id == user_id).all()
+    tasks = db.query(Task).filter(Task.user_id == current_user.id).all()
     return tasks
 
 
 # Create a new task
-@router.post("/createtask", response_model=TaskResponse)
-def create_task(task: TaskCreate, user_id: int, db: Session = Depends(get_db)):
+@router.post("/", response_model=TaskResponse)
+def create_task(task: TaskCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Create a new task for the current user"""
-    db_task = Task(**task.dict(), user_id=user_id)
+    db_task = Task(**task.dict(), user_id=current_user.id)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
@@ -39,9 +56,9 @@ def create_task(task: TaskCreate, user_id: int, db: Session = Depends(get_db)):
 
 # Complete a task and earn XP
 @router.post("/{id}/complete", response_model=dict)
-def complete_task(id: int, user_id: int, db: Session = Depends(get_db)):
+def complete_task(id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Mark a task as completed and earn XP"""
-    task = db.query(Task).filter(Task.id == id, Task.user_id == user_id).first()
+    task = db.query(Task).filter(Task.id == id, Task.user_id == current_user.id).first()
     
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -53,8 +70,7 @@ def complete_task(id: int, user_id: int, db: Session = Depends(get_db)):
     task.is_completed = True
     
     # Update user XP
-    from app.models.user_model import User
-    user = db.query(User).filter(User.id == user_id).first()
+    user = db.query(User).filter(User.id == current_user.id).first()
     if user:
         user.current_xp += task.xp_reward
         # Check for level up
@@ -68,10 +84,10 @@ def complete_task(id: int, user_id: int, db: Session = Depends(get_db)):
 
 
 # Delete a task
-@router.delete("/{id}/delete", response_model=dict)
-def delete_task(id: int, user_id: int, db: Session = Depends(get_db)):
+@router.delete("/{id}", response_model=dict)
+def delete_task(id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Delete a task"""
-    task = db.query(Task).filter(Task.id == id, Task.user_id == user_id).first()
+    task = db.query(Task).filter(Task.id == id, Task.user_id == current_user.id).first()
     
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -82,10 +98,10 @@ def delete_task(id: int, user_id: int, db: Session = Depends(get_db)):
 
 
 # Edit a task
-@router.put("/{id}/edit", response_model=TaskResponse)
-def edit_Task(id: int, task_update: TaskUpdate, user_id: int, db: Session = Depends(get_db)):
+@router.put("/{id}", response_model=TaskResponse)
+def edit_task(id: int, task_update: TaskUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Edit an existing task"""
-    task = db.query(Task).filter(task.id == id, task.user_id == user_id).first()
+    task = db.query(Task).filter(Task.id == id, Task.user_id == current_user.id).first()
     
     if not task:
         raise HTTPException(status_code=404, detail="task not found")
