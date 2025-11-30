@@ -235,12 +235,3 @@ Send JSON body.
 
 ---
 
-### ➕ If you want, I can also generate:
-
-* Postman Collection JSON
-* Full API Documentation README.md
-* Testing instructions for frontend
-* Swagger customization
-* Task endpoints next
-* XP system endpoints next
-
