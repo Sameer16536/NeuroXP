@@ -48,11 +48,16 @@ def get_habits(current_user: User = Depends(get_current_user), db: Session = Dep
 def create_habit(habit: HabitCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Create a new habit for the current user"""
     db_habit = Habit(**habit.dict(), user_id=current_user.id)
-    db.add(db_habit)
-    db.commit()
-    db.refresh(db_habit)
-    return db_habit
-
+    try:
+        db.add(db_habit)
+        db.commit()
+        db.refresh(db_habit)
+        return db_habit
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not create habit")
+    
+    
 
 # Complete a habit and earn XP
 @router.post("/{id}/complete", response_model=dict)
@@ -76,9 +81,14 @@ def complete_habit(id: int, current_user: User = Depends(get_current_user), db: 
             user.current_xp -= user.xp_to_next_level
             user.xp_to_next_level = int(user.xp_to_next_level * 1.1)  # Increase next level requirement
     
-    db.commit()
-    return {"success": True, "xp_gained": habit.xp_reward}
-
+    try:
+        db.commit()
+        return {"success": True, "xp_gained": habit.xp_reward}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not complete habit")
+    
+    
 
 # Delete a Habit
 @router.delete("/{id}", response_model=dict)
@@ -97,6 +107,8 @@ def delete_habit(id: int, current_user: User = Depends(get_current_user), db: Se
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Could not delete habit")
+    
+    
 
 # Edit a Habit
 @router.put("/{id}", response_model=HabitResponse)
@@ -113,6 +125,10 @@ def edit_habit(id: int, habit_update: HabitUpdate, current_user: User = Depends(
     for key, value in updatedData.items():
         setattr(habit, key, value)
     
-    db.commit()
-    db.refresh(habit)
-    return habit
+    try:
+        db.commit()
+        db.refresh(habit)
+        return {"success": True, "habit": habit}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Could not update habit")                
