@@ -47,11 +47,16 @@ def get_tasks(current_user: User = Depends(get_current_user), db: Session = Depe
 @router.post("/", response_model=TaskResponse)
 def create_task(task: TaskCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Create a new task for the current user"""
-    db_task = Task(**task.dict(), user_id=current_user.id)
-    db.add(db_task)
-    db.commit()
-    db.refresh(db_task)
-    return db_task
+    try:
+        db_task = Task(**task.dict(), user_id=current_user.id)
+        db.add(db_task)
+        db.commit()
+        db.refresh(db_task)
+        return db_task
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to create task")
+    
 
 
 # Complete a task and earn XP
@@ -78,9 +83,13 @@ def complete_task(id: int, current_user: User = Depends(get_current_user), db: S
             user.level += 1
             user.current_xp -= user.xp_to_next_level
             user.xp_to_next_level = int(user.xp_to_next_level * 1.1)  # Increase next level requirement
-    
-    db.commit()
-    return {"success": True, "xp_gained": task.xp_reward}
+    try:
+        db.commit()
+        return {"success": True, "xp_gained": task.xp_reward}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to complete task")
+
 
 
 # Delete a task
@@ -92,10 +101,15 @@ def delete_task(id: int, current_user: User = Depends(get_current_user), db: Ses
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     
-    db.delete(task)
-    db.commit()
-    return {"success": True}
-
+    try:
+        db.delete(task)
+        db.commit()
+        return {"success": True}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to delete task")
+    
+    
 
 # Edit a task
 @router.put("/{id}", response_model=TaskResponse)
@@ -112,6 +126,10 @@ def edit_task(id: int, task_update: TaskUpdate, current_user: User = Depends(get
     for key, value in updatedData.items():
         setattr(task, key, value)
     
-    db.commit()
-    db.refresh(task)
-    return task
+    try:
+        db.commit()
+        db.refresh(task)
+        return task
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Failed to update task")
