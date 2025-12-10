@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # 1. The API Server
+  backend:
+    build: ./server
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./server:/app  # Live reload code changes
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://neuro_user:neuro_pass@db/neuroxp_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+  # 2. The Background Worker (AI Processor)
+  worker:
+    build: ./server
+    # Different command: runs Celery instead of Uvicorn
+    command: celery -A worker.celery_app worker --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      # Worker usually doesn't need direct DB access if it just returns data
+    depends_on:
+      - redis
+
+  # 3. Database
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=neuro_user
+      - POSTGRES_PASSWORD=neuro_pass
+      - POSTGRES_DB=neuroxp_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # 4. Redis (Queue & Cache)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
