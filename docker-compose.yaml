@@ -22,7 +22,7 @@ services:
     # Different command: runs Celery instead of Uvicorn
     command: celery -A worker.celery_app worker --loglevel=info
     environment:
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=${REDIS_URL}
       # Worker usually doesn't need direct DB access if it just returns data
     depends_on:
       - redis
